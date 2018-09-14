@@ -7,7 +7,7 @@ depend: [WorldEdit]
 commands:
   setup:
     description: Does the setup mode
-    permission: survivalsystem.setup
+    permission: survivalsystem.setup 
   rtp:
     description: LOL
 

@@ -210,7 +210,7 @@ public class Trade {
             if (this.trReq.isOnline() && this.trAcc.isOnline() && ((this.trReq.getWorld().getName().equals(this.trAcc.getWorld().getName()) && this.trReq.getLocation().distance(this.trAcc.getLocation()) <= TradeMain.getConfig().getDouble("Distance")) || TradeMain.getConfig().getDouble("Distance") < 0.0)) {
                 final String invName = TradeMain.getItemName("inventory");
                 int invsize = 36;
-                if (TradeMain.tradecurr) {
+                if (TradeMain.tradecurr) { 
                     invsize = 45;
                 }
                 final Inventory inv = Bukkit.createInventory(null, invsize, invName);
