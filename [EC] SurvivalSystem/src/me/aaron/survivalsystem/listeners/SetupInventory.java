@@ -31,7 +31,7 @@ public class SetupInventory implements Listener {
 			if (p.getItemInHand().getType() == Material.COMPASS) {
 				if (Main.getInstance().playerInSetupMode.contains(p)) {
 					Inventory setupInventory = Bukkit.createInventory(null, 3, "§cSetup Items");
-					p.playSound(p.getLocation(), Sound.ENTITY_CHICKEN_EGG, 1, 1);
+					p.playSound(p.getLocation(), Sound.ENTITY_CHICKEN_EGG, 1, 1); 
 					
 					setupInventory.addItem(setSpawn);
 					setupInventory.addItem(setSpawnArea);
