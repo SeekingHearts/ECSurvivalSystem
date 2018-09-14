@@ -20,9 +20,7 @@ public class cmdSetup implements CommandExecutor {
 
 				if (p.hasPermission("survivalsystem.setup")) {
 					if (Main.getInstance().playerInSetupMode.contains(p.getName())) {
-
 						p.getInventory().clear();
-						p.getInventory().addItem(SetupInventory.compass);
 						PlayerUtils.restoreInventory(false, p);
 						PlayerUtils.restoreInventory(true, p);
 						
@@ -30,9 +28,9 @@ public class cmdSetup implements CommandExecutor {
 						p.sendMessage(ChatColor.RED + "Du bist nun " + ChatColor.YELLOW + "nicht" + ChatColor.RED
 								+ " mehr im Setup-Mode!.");
 					} else {
-
 						PlayerUtils.saveInventory(p);
 						p.getInventory().clear();
+						p.getInventory().setItem(4 , SetupInventory.compass);
 						
 						Main.getInstance().playerInSetupMode.add(p.getName());
 						p.sendMessage(ChatColor.GREEN
