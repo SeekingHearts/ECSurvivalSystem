@@ -24,12 +24,44 @@ public class TradeUtils {
 		}
 	}
 	
-	public Inventory setItemsLeft(final Inventory inv, final ItemStack[] items) {
+	public static Inventory setItemsLeft(final Inventory inv, final ItemStack[] items) {
 		final List<ItemStack> itms = new ArrayList<>();
 		for (final ItemStack itm : items) {
 			itms.add(itm);
 		}
-		int 
+		int s = 0;
+		while (itms.size() > 0) {
+			if (s != 3 && s != 12 && s != 21) {
+				inv.setItem(s, itms.get(0));
+				itms.remove(itms.get(0));
+				++s;
+			} else {
+				inv.setItem(s, itms.get(0));
+				itms.remove(itms.get(0));
+				s += 6;
+			}
+		}
+		return inv;
+	}
+	
+	public static Inventory setItemsRight(final Inventory inv, final ItemStack[] items) {
+		final List<ItemStack> itms = new ArrayList<>();
+		for (final ItemStack itm : items) {
+			itms.add(itm);
+		}
+		int s = 5;
+		while (itms.size() > 0) {
+			if (s != 8 && s != 17 && s != 26) {
+				inv.setItem(s, itms.get(0));
+				itms.remove(itms.get(0));
+				++s;
+			} else {
+				inv.setItem(s, itms.get(0));
+				itms.remove(itms.get(0));
+				s += 6;
+			}
+		}
+		return inv;
 	}
 	
 	public List<Trade> getAllTrades() {
