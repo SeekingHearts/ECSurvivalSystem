@@ -7,11 +7,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 import me.aaron.survivalsystem.commands.*;
-import net.md_5.bungee.api.ChatColor;
+import me.aaron.survivalsystem.listeners.SetupInventory;
 
 public class Main extends JavaPlugin {
 
@@ -27,6 +28,7 @@ public class Main extends JavaPlugin {
 		checkForWorldEdit();
 		setupConfig();
 		initCommands();
+		initListeners();
 		
 		debug = true; // TODO CHANGE
 	}
@@ -51,6 +53,13 @@ public class Main extends JavaPlugin {
 	private void initCommands() {
 		getCommand("setup").setExecutor(new cmdSetup());
 		getCommand("rtp").setExecutor(new cmdRandomTP());
+		getCommand("checkarray").setExecutor(new cmdCheckArrays());
+	}
+	
+	private void initListeners() {
+		PluginManager pm = getServer().getPluginManager();
+		
+		pm.registerEvents(new SetupInventory(), this);
 	}
 	
 	private void setupConfig() {

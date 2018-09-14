@@ -3,6 +3,7 @@ version: 1.0
 authors: [Aaron alias TheSaltyOne, Patrick]
 main: me.aaron.survivalsystem.main.Main
 depend: [WorldEdit]
+api-version: 1.13
 
 commands:
   setup:
@@ -10,6 +11,8 @@ commands:
     permission: survivalsystem.setup 
   rtp:
     description: LOL
+  checkarray:
+    description: DEV COMMAND DONT TOUCH
 
 permissions:
   survivalsystem.setup:
