@@ -10,7 +10,7 @@ public class TradeMain {
 
 	static Main pl;
 	
-	public static boolean tracecurr;
+	public static boolean tradecurr;
 	public static double tradecurramount;
 
 	public static String getMessage(final String type) {
