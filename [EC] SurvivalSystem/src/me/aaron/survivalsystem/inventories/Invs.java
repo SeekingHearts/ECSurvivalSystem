@@ -1,5 +1,7 @@
 package me.aaron.survivalsystem.inventories;
 
+import java.util.Arrays;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -16,7 +18,7 @@ public class Invs {
 	
 	public static void openTradeMenu(Player p) {
 		Inventory trade = Bukkit.createInventory(null, 3 * 9, ChatColor.LIGHT_PURPLE + "TRADING " + ChatColor.AQUA + " MENU");
-		ItemStack ph = ItemUtils.getItem(Material.WHITE_STAINED_GLASS_PANE, ChatColor.BLACK + "Platzhalter", "", 0, 1);
+		ItemStack ph = ItemUtils.getItem(Material.WHITE_STAINED_GLASS_PANE, ChatColor.BLACK + "Platzhalter", Arrays.asList(null), 0, 1);
 		
 		for (int i = 0; i < 6; i++) {
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), new BukkitRunnable() {
@@ -33,14 +35,14 @@ public class Invs {
 
 			@Override
 			public void run() {
-				trade.setItem(12, ItemUtils.getItem(Material.GRAY_DYE, ChatColor.GRAY + "Tausch akzeptieren", "", 0, 1));
+				trade.setItem(12, ItemUtils.getItem(Material.GRAY_DYE, ChatColor.GRAY + "Tausch akzeptieren", Arrays.asList(null), 0, 1));
 				p.playSound(p.getLocation(), Sound.ENTITY_CHICKEN_EGG, 1, 1);
 				
 				Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getInstance(), new BukkitRunnable() {
 					
 					@Override
 					public void run() {
-						trade.setItem(12, ItemUtils.getItem(Material.GRAY_DYE, ChatColor.GRAY + "Tausch akzeptieren", "", 0, 1));
+						trade.setItem(12, ItemUtils.getItem(Material.GRAY_DYE, ChatColor.GRAY + "Tausch akzeptieren", Arrays.asList(null), 0, 1));
 						p.playSound(p.getLocation(), Sound.ENTITY_CHICKEN_EGG, 1, 1);
 					}
 				}, 2);
