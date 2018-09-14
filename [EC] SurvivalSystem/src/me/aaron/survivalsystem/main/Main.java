@@ -13,14 +13,22 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 import me.aaron.survivalsystem.commands.*;
 import me.aaron.survivalsystem.listeners.SetupInventory;
+import me.aaron.survivalsystem.trade.TradeMain;
+import net.milkbowl.vault.economy.Economy;
 
 public class Main extends JavaPlugin {
 
 	private static Main instance;
 	private static boolean debug = false;
-	
+
+	private static Economy eco;
 	
 	public List<String> playerInSetupMode = new ArrayList<>();
+	
+	public Main() {
+		TradeMain.tradecurramount = 0.0;
+		eco = null;
+	}
 	
 	@Override
 	public void onEnable() {
@@ -73,6 +81,10 @@ public class Main extends JavaPlugin {
 			return (WorldEditPlugin) pl;
 		else 
 			return null;
+	}
+	
+	public static Economy getEconomy() {
+		return eco;
 	}
 	
 	protected void checkForWorldEdit() {

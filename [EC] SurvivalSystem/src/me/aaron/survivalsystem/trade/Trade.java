@@ -201,15 +201,39 @@ public class Trade {
 			@Override
 			public void run() {
 				if (!isCancelled()) {
-					
+					updateOpenTrade();
+					if (secs < pl.getConfig().getInt("CountdownLength")) {
+						if (trReq.isOnline() || trAcc.isOnline() || hasTradeWindowOpen(trReq) || hasTradeWindowOpen(trAcc)) {
+							cancelTrade(true);
+							this.cancel();
+						}
+					} else if (TradeMain.tradecurr) {
+						final double balanceR = Main.getEconomy().getBalance(getRequester());
+						final double balanceA = Main.getEconomy().getBalance(getAccepter());
+						if (balanceR >= currReq && balanceA >= currAcc) {
+							cancelTrade(false);
+							this.cancel();
+						} else {
+							cancelTrade(true);
+							this.cancel();
+						}
+					} else {
+						cancelTrade(false);
+						this.cancel();
+					}
+					final Trade this_ = Trade.this;
+					--this_.cd;
+					++this.secs;
+				} else {
+					this.cancel();
 				}
 			}
-		};
+		}.runTaskTimer(pl, 20L, 20L);
 	}
 	
 	public void updateOpenTrade() {
         if (!this.isCancelled() && this.trReq.getOpenInventory() != null && this.trAcc.getOpenInventory() != null) {
-            if (this.trReq.isOnline() && this.trAcc.isOnline() && ((this.trReq.getWorld().getName().equals(this.trAcc.getWorld().getName()) && this.trReq.getLocation().distance(this.trAcc.getLocation()) <= TradeMain.getConfig().getDouble("Distance")) || TradeMain.getConfig().getDouble("Distance") < 0.0)) {
+            if (this.trReq.isOnline() && this.trAcc.isOnline() && ((this.trReq.getWorld().getName().equals(this.trAcc.getWorld().getName()) && this.trReq.getLocation().distance(this.trAcc.getLocation()) <= pl.getConfig().getDouble("Distance")) || pl.getConfig().getDouble("Distance") < 0.0)) {
                 final String invName = TradeMain.getItemName("inventory");
                 int invsize = 36;
                 if (TradeMain.tradecurr) { 
@@ -318,9 +342,44 @@ public class Trade {
 				trAcc.sendMessage(TradeMain.getMessage("trade-cancelled"));
 		} else {
 			if (TradeMain.tradecurr) {
-				
+				Main.getEconomy().depositPlayer(getRequester(), currAcc);
+				Main.getEconomy().withdrawPlayer(getAccepter(), currAcc);
+				Main.getEconomy().depositPlayer(getAccepter(), currReq);
+				Main.getEconomy().withdrawPlayer(getRequester(), currReq);
+				if (currAcc > 0.0) {
+					getRequester().sendMessage(TradeMain.getMessage("received-currency").replaceAll("%currencyamount%", new StringBuilder(String.valueOf(currAcc)).toString()));
+					getAccepter().sendMessage(TradeMain.getMessage("traded-currency").replaceAll("%currencyamount%", new StringBuilder(String.valueOf(currAcc)).toString()));
+				}
+				if (currReq > 0.0) {
+					getAccepter().sendMessage(TradeMain.getMessage("received-currency").replaceAll("%currencyamount%", new StringBuilder(String.valueOf(currReq)).toString()));
+					getRequester().sendMessage(TradeMain.getMessage("traded-currency").replaceAll("%currencyamount%", new StringBuilder(String.valueOf(currReq)).toString()));
+				}
 			}
+			giveItemsFromTrade();
+			closeTrade();
+			if (trReq.isOnline())
+				trReq.sendMessage(TradeMain.getMessage("trade-successful"));
+			if (trAcc.isOnline())
+				trAcc.sendMessage(TradeMain.getMessage("trade-successful"));
 		}
+		cdInProgress = false;
+		TradeUtils.removeTrade(this);
+	}
+	
+	public void giveItemsFromTrade() {
+		final ItemStack[] e = new ItemStack[0];
+		trReq.getInventory().addItem(getAccepterTradeRequestItems());
+		setAccepterTradeRequestItems(e);
+		trAcc.getInventory().addItem(getRequesterTradeRequestItems());
+		setRequesterTradeRequestItems(e);
+	}
+	
+	public void returnItems() {
+		final ItemStack[] e = new ItemStack[0];
+		trReq.getInventory().addItem(getRequesterTradeRequestItems());
+		setRequesterTradeRequestItems(e);
+		trAcc.getInventory().addItem(getAccepterTradeRequestItems());
+		setAccepterTradeRequestItems(e);
 	}
 	
 	public void setRequesterReady(final boolean ready) {
@@ -341,6 +400,19 @@ public class Trade {
 			startReadyCounter();
 	}
 	
+	public boolean hasTradeWindowOpen(final Player p) {
+		boolean open = false;
+		if (p.getOpenInventory() != null) {
+			final Inventory inv = p.getOpenInventory().getTopInventory();
+			int invsize = 36;
+			if (TradeMain.tradecurr)
+				invsize = 45;
+			if (inv.getSize() == invsize && inv.getTitle().contains(TradeMain.getItemName("inventory")))
+				open = true;
+		}
+		return open;
+	}
+	
 	public ItemStack[] getRequesterTradeRequestItems() {
 		return reqTradeReqItm;
 	}
@@ -351,6 +423,14 @@ public class Trade {
 	
 	public boolean isCountdownInProgress() {
 		return cdInProgress;
+	}
+	
+	public Player getRequester() {
+		return trReq;
+	}
+
+	public Player getAccepter() {
+		return trAcc;
 	}
 	
 	public void setRequesterTradeRequestItems(final ItemStack[] itm) {

@@ -10,18 +10,21 @@ public class TradeUtils {
 
 	private TradeMain tm;
 	
-	private List<Trade> trList;
+	private static List<Trade> trList;
 	
 	public TradeUtils(final TradeMain tm) {
 		this.trList = new ArrayList<>();
 		this.tm = tm;
 	}
 
-	public void removeTrade(final Trade t) {
+	public static void removeTrade(final Trade t) {
 		final List<Trade> trades = new ArrayList<>();
 		for (final Trade tr : trList) {
-			if (!tr.getRequestor())
+			if (tr.getRequester() != t.getRequester() || tr.getAccepter() != tr.getAccepter()) {
+				trades.add(tr);
+			}
 		}
+		trList = trades;
 	}
 	
 	public static Inventory setItemsLeft(final Inventory inv, final ItemStack[] items) {
