@@ -11,12 +11,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 import me.aaron.survivalsystem.commands.*;
+import net.md_5.bungee.api.ChatColor;
 
 public class Main extends JavaPlugin {
 
 	private static Main instance;
+	private static boolean debug = false;
 	
-	private static boolean debug;
 	
 	public List<String> playerInSetupMode = new ArrayList<>();
 	
@@ -72,7 +73,6 @@ public class Main extends JavaPlugin {
 			return;
 		}
 	}
-	
 	
 	public static Main getInstance() {
 		return instance;
