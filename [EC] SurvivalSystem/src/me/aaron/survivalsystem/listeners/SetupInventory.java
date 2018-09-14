@@ -19,7 +19,7 @@ import me.aaron.survivalsystem.utils.ItemUtils;
 
 public class SetupInventory implements Listener {
 	
-	ItemStack compass = ItemUtils.getItem(Material.COMPASS, "§cCompass", null, 0, 1);
+	public static ItemStack compass = ItemUtils.getItem(Material.COMPASS, "§cCompass", null, 0, 1);
 	ItemStack setSpawn = ItemUtils.getItem(Material.BEACON, "§aSetSpawn", Arrays.asList(ChatColor.GRAY+"Setze den Spawn Punkt"), 0, 1);
 	ItemStack setSpawnArea = ItemUtils.getItem(Material.COMPASS, "§aSetSpawnArea", Arrays.asList(ChatColor.GRAY+"Setze die Spawngegend"), 0, 1);
 	ItemStack setNoPVPZone = ItemUtils.getItem(Material.GREEN_WOOL, "§aSetNoPVPZone", Arrays.asList(ChatColor.GRAY+"Setze PVP freie Zone"), 0, 1);

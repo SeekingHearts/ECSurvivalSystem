@@ -6,6 +6,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import me.aaron.survivalsystem.listeners.SetupInventory;
 import me.aaron.survivalsystem.main.Main;
 import me.aaron.survivalsystem.utils.PlayerUtils;
 
@@ -21,6 +22,7 @@ public class cmdSetup implements CommandExecutor {
 					if (Main.getInstance().playerInSetupMode.contains(p.getName())) {
 
 						p.getInventory().clear();
+						p.getInventory().addItem(SetupInventory.compass);
 						PlayerUtils.restoreInventory(false, p);
 						PlayerUtils.restoreInventory(true, p);
 						
