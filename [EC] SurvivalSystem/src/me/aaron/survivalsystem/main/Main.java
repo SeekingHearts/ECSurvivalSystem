@@ -10,8 +10,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
-import me.aaron.survivalsystem.commands.cmdSetup;
-import me.patrick.survivalsystem.commands.cmdRandomTP;
+import me.aaron.survivalsystem.commands.*;
 
 public class Main extends JavaPlugin {
 
