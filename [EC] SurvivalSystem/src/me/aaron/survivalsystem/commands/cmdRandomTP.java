@@ -28,10 +28,5 @@ public class cmdRandomTP implements CommandExecutor {
 		} else 
 			sender.sendMessage("Command only for players avaiable!");
 		return true;
-
-			
 	}
-	
-	
-	
 }

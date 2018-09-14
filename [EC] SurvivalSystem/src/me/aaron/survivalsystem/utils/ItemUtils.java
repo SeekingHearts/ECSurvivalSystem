@@ -69,23 +69,13 @@ public class ItemUtils {
 		return instance;
 	}
 	
-	public static ItemStack getItem(Material mat, String name, String lore, int dmg, int amount) {
+	public static ItemStack getItem(Material mat, String name, List<String> list, int dmg, int amount) {
 		
 		ItemStack itm = new ItemStack(mat, amount, (short) dmg);
 		ItemMeta meta = itm.getItemMeta();
 		
-		if (lore != null) {
-			if (lore.contains("\n")) {
-				ArrayList<String> lorelist = new ArrayList<>();
-				String[] loresplit = lore.split("\n");
-				
-				for (String txt : loresplit) {
-					lorelist.add(txt);
-				}
-				meta.setLore(lorelist);
-			} else {
-				meta.setLore(Arrays.asList(lore));
-			}
+		if (list != null) {
+				meta.setLore(list);
 		}
 		meta.setDisplayName(name);
 		itm.setItemMeta(meta);
