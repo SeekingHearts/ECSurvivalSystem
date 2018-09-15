@@ -19,7 +19,7 @@ public class cmdCheckArrays implements CommandExecutor {
 		if (args.length != 1)
 			return true;
 		
-		if (sender.getName().equals("TheSaltyOne") || sender.getName().equals("**NAME**")) {
+		if (sender.getName().equals("TheSaltyOne") || sender.getName().equals("NighthuntShadow")) {
 			String array = args[0];
 			try {
 				
