@@ -10,9 +10,11 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 import me.aaron.survivalsystem.commands.*;
 import me.aaron.survivalsystem.listeners.SetupInventory;
+import me.aaron.survivalsystem.listeners.listenerRespawn;
 import me.aaron.survivalsystem.trade.TradeMain;
 import net.milkbowl.vault.economy.Economy;
 
@@ -33,7 +35,7 @@ public class Main extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		instance = this;
-		checkForWorldEdit();
+		checkForDependencies();
 		setupConfig();
 		initCommands();
 		initListeners();
@@ -68,11 +70,20 @@ public class Main extends JavaPlugin {
 		PluginManager pm = getServer().getPluginManager();
 		
 		pm.registerEvents(new SetupInventory(), this);
+		pm.registerEvents(new listenerRespawn(), this);
 	}
 	
 	private void setupConfig() {
 		getConfig().options().copyDefaults(true);
 		saveDefaultConfig();
+	}
+	
+	public static WorldGuardPlugin getWorldGuard() {
+		Plugin pl = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
+		if (pl instanceof WorldGuardPlugin)
+			return (WorldGuardPlugin) pl;
+		else
+			return null;
 	}
 	
 	public static WorldEditPlugin getWorldEdit() {
@@ -87,12 +98,20 @@ public class Main extends JavaPlugin {
 		return eco;
 	}
 	
-	protected void checkForWorldEdit() {
+	protected void checkForDependencies() {
 		if ((getServer().getPluginManager().getPlugin("WorldEdit") != null) && !(getServer().getPluginManager().getPlugin("WorldEdit").isEnabled())) {
 			getLogger().severe("WorldEdit Plugin not found! Disabling plugin...");
-			getServer().getPluginManager().disablePlugin(this);
-			return;
+			disablePlugin();
 		}
+		if ((getServer().getPluginManager().getPlugin("WorldGuard") != null) && !(getServer().getPluginManager().getPlugin("WorldGuard").isEnabled())) {
+			getLogger().severe("WorldGuard Plugin not found! Disabling plugin...");
+			disablePlugin();
+		}
+	}
+	
+	protected void disablePlugin() {
+		getServer().getPluginManager().disablePlugin(this);
+		return;
 	}
 	
 	public static Main getInstance() {

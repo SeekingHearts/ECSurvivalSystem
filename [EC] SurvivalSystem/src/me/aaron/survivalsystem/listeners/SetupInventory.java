@@ -64,7 +64,13 @@ public class SetupInventory implements Listener {
 		
 		if (e.getInventory().getName().equals("§cSetup Items") && e.getInventory().getSize() == 9) {
 			if (e.getSlot() == 0 && e.getCurrentItem().getItemMeta().getDisplayName().equals("§aSetSpawn")) {
-				Main.getInstance().getConfig().set("location.spawn", p.getLocation());
+				Main.getInstance().getConfig().set("locations.spawn.world", p.getLocation().getWorld().getName());
+				Main.getInstance().getConfig().set("locations.spawn.x", p.getLocation().getX());
+				Main.getInstance().getConfig().set("locations.spawn.y", p.getLocation().getY());
+				Main.getInstance().getConfig().set("locations.spawn.z", p.getLocation().getZ());
+				Main.getInstance().getConfig().set("locations.spawn.yaw", p.getLocation().getYaw());
+				Main.getInstance().getConfig().set("locations.spawn.pitch", p.getLocation().getPitch());
+				
 				Main.getInstance().saveConfig();
 				p.sendMessage(ChatColor.YELLOW + "Neuer Spawnpoint gesetzt!");
 			} else if (e.getCurrentItem() == setSpawnArea) {	

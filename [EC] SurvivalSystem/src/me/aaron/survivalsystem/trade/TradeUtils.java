@@ -93,6 +93,11 @@ public class TradeUtils {
 		return inv;
 	}
 	
+	public ItemStack[] getItemsRequester(final Player p) {
+		final List<ItemStack> itms = new ArrayList<>();
+		return null;
+	}
+	
 	public List<Trade> getAllTrades() {
 		return trList;
 	}

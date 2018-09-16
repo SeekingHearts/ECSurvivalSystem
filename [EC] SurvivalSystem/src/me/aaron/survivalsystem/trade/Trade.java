@@ -376,7 +376,7 @@ public class Trade {
 	
 	public void updateTradeItems() {
 		if (!isCancelled() && trReq.getOpenInventory() != null && trAcc.getOpenInventory() != null && trReq.isOnline() && trAcc.isOnline() && (trReq.getWorld() == trReq.getWorld() && trReq.getLocation().distance(trAcc.getLocation()) <= pl.getConfig().getDouble("Distance")) || pl.getConfig().getDouble("Distance") < 0.0) {
-			setRequesterTradeRequestItems(TradeUtils.);
+//			setRequesterTradeRequestItems(TradeUtils.getI);
 		}
 	}
 	
