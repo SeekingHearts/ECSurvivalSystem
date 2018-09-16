@@ -59,7 +59,7 @@ public class Trade {
 		this.trAcc = trAcc;
 		trReq.sendMessage(TradeMain.getMessage("trade-request-send").replaceAll("%accepter%", trAcc.getName()));
 		trAcc.sendMessage(TradeMain.getMessage("trade-request-received").replaceAll("%requester%", trReq.getName()));
-//		TODO
+		this.startTimeOutCounter();
 	}
 
 	public void openTrade() {
@@ -372,6 +372,12 @@ public class Trade {
 		setAccepterTradeRequestItems(e);
 		trAcc.getInventory().addItem(getRequesterTradeRequestItems());
 		setRequesterTradeRequestItems(e);
+	}
+	
+	public void updateTradeItems() {
+		if (!isCancelled() && trReq.getOpenInventory() != null && trAcc.getOpenInventory() != null && trReq.isOnline() && trAcc.isOnline() && (trReq.getWorld() == trReq.getWorld() && trReq.getLocation().distance(trAcc.getLocation()) <= pl.getConfig().getDouble("Distance")) || pl.getConfig().getDouble("Distance") < 0.0) {
+			setRequesterTradeRequestItems(TradeUtils.);
+		}
 	}
 	
 	public void returnItems() {

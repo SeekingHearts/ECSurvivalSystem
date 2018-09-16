@@ -3,6 +3,7 @@ package me.aaron.survivalsystem.trade;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -25,6 +26,31 @@ public class TradeUtils {
 			}
 		}
 		trList = trades;
+	}
+	
+	public void addTrade(final Trade t) {
+		if (!t.isCancelled()) {
+			removeTrade(t);
+			trList.add(t);
+		}
+	}
+	
+	public Trade getTradeFromRequester(final Player req) {
+		Trade t = null;
+		for (final Trade tr : trList) {
+			if (tr.getRequester().getName().equalsIgnoreCase(req.getName()))
+				t = tr;
+		}
+		return t;
+	}
+	
+	public Trade getTradeFromAccepter(final Player acc) {
+		Trade t = null;
+		for (final Trade tr : trList) {
+			if (tr.getAccepter().getName().equalsIgnoreCase(acc.getName()))
+				t = tr;
+		}
+		return t;
 	}
 	
 	public static Inventory setItemsLeft(final Inventory inv, final ItemStack[] items) {
