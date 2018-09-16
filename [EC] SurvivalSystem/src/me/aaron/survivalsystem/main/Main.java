@@ -37,7 +37,7 @@ public class Main extends JavaPlugin {
 		setupConfig();
 		initCommands();
 		initListeners();
-		
+		 
 		debug = true; // TODO CHANGE
 	}
 	
