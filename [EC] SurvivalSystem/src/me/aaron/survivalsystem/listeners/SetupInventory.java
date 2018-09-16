@@ -23,7 +23,7 @@ import me.aaron.survivalsystem.utils.ItemUtils;
 
 public class SetupInventory implements Listener {
 
-	public static ItemStack compass = ItemUtils.getItem(Material.COMPASS, "§cCompass", null, 0, 1);
+	public static ItemStack compass = ItemUtils.getItem(Material.COMPASS, "§aSetup Inventar", null, 0, 1);
 	ItemStack setSpawn = ItemUtils.getItem(Material.BEACON, "§aSetSpawn",
 			Arrays.asList(ChatColor.GRAY + "Setze den Spawn Punkt"), 0, 1);
 	ItemStack setSpawnArea = ItemUtils.getItem(Material.COMPASS, "§aSet Spawn Area",
@@ -39,8 +39,8 @@ public class SetupInventory implements Listener {
 			return;
 
 		if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-			if (p.getItemInHand().getType() == Material.COMPASS) {
-				if (p.getInventory().getItemInHand().isSimilar(compass)) {
+			if (p.getItemInHand().getType() == Material.COMPASS && e.getItem().getItemMeta().getDisplayName().equals("§aSetup Inventar")) {
+				
 
 				Inventory setupInventory = Bukkit.createInventory(null, 9, "§cSetup Items");
 				p.playSound(p.getLocation(), Sound.ENTITY_CHICKEN_EGG, 1, 1);
@@ -50,7 +50,7 @@ public class SetupInventory implements Listener {
 				setupInventory.addItem(setNoPVPZone);
 
 				p.openInventory(setupInventory);
-				}
+				
 			}
 		}
 	}
@@ -63,11 +63,9 @@ public class SetupInventory implements Listener {
 			return;
 		
 		if (e.getInventory().getName().equals("§cSetup Items") && e.getInventory().getSize() == 9) {
-			if (e.getCurrentItem() == setSpawn) {
+			if (e.getSlot() == 0 && e.getCurrentItem().getItemMeta().getDisplayName().equals("§aSetSpawn")) {
 				World world = p.getWorld();
-				Block spawnBlock = p.getTargetBlock(null, 100);
-				Location spawnLoc = spawnBlock.getLocation();
-				world.setSpawnLocation(spawnLoc.getBlockX(), spawnLoc.getBlockY() + 1, spawnLoc.getBlockZ());
+				world.setSpawnLocation(p.getLocation());
 				p.sendMessage(ChatColor.YELLOW + "Neuer Spawnpoint gesetzt!");
 			} else if (e.getCurrentItem() == setSpawnArea) {	
 				p.sendMessage("Tool setSpawnArea");
