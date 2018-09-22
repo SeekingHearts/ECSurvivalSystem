@@ -4,11 +4,8 @@ import java.util.Arrays;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,17 +15,27 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.World;
+import com.sk89q.worldguard.domains.DefaultDomain;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.flags.StateFlag.State;
+import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
+
 import me.aaron.survivalsystem.main.Main;
 import me.aaron.survivalsystem.utils.ItemUtils;
+import me.aaron.survivalsystem.utils.WGUtils;
 
 public class SetupInventory implements Listener {
 
 	public static ItemStack compass = ItemUtils.getItem(Material.COMPASS, "§aSetup Inventar", null, 0, 1);
-	ItemStack setSpawn = ItemUtils.getItem(Material.BEACON, "§aSetSpawn",
+	ItemStack setSpawn = ItemUtils.getItem(Material.BEACON, "§aSetze Spawn",
 			Arrays.asList(ChatColor.GRAY + "Setze den Spawn Punkt"), 0, 1);
-	ItemStack setSpawnArea = ItemUtils.getItem(Material.COMPASS, "§aSet Spawn Area",
+	ItemStack setSpawnArea = ItemUtils.getItem(Material.COMPASS, "§aSetze Spawn Region",
 			Arrays.asList(ChatColor.GRAY + "Setze die Spawngegend"), 0, 1);
-	ItemStack setNoPVPZone = ItemUtils.getItem(Material.GREEN_WOOL, "§aSet No PVP Zone",
+	ItemStack setNoPVPZone = ItemUtils.getItem(Material.GREEN_WOOL, "§aSetze PVP-freie Zone",
 			Arrays.asList(ChatColor.GRAY + "Setze PVP freie Zone"), 0, 1);
 	// ItemStack = ItemUtils.getItem(mat, name, lore, dmg, amount);
 
@@ -39,8 +46,8 @@ public class SetupInventory implements Listener {
 			return;
 
 		if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-			if (p.getItemInHand().getType() == Material.COMPASS && e.getItem().getItemMeta().getDisplayName().equals("§aSetup Inventar")) {
-				
+			if (p.getItemInHand().getType() == Material.COMPASS
+					&& e.getItem().getItemMeta().getDisplayName().equals("§aSetup Inventar")) {
 
 				Inventory setupInventory = Bukkit.createInventory(null, 9, "§cSetup Items");
 				p.playSound(p.getLocation(), Sound.ENTITY_CHICKEN_EGG, 1, 1);
@@ -50,7 +57,6 @@ public class SetupInventory implements Listener {
 				setupInventory.addItem(setNoPVPZone);
 
 				p.openInventory(setupInventory);
-				
 			}
 		}
 	}
@@ -58,29 +64,92 @@ public class SetupInventory implements Listener {
 	@EventHandler
 	public void onCompassClick(final InventoryClickEvent e) {
 		Player p = (Player) e.getWhoClicked();
-		
+
 		if (!Main.getInstance().playerInSetupMode.contains(p.getName()))
 			return;
-		
-		if (e.getInventory().getName().equals("§cSetup Items") && e.getInventory().getSize() == 9) {
-			if (e.getSlot() == 0 && e.getCurrentItem().getItemMeta().getDisplayName().equals("§aSetSpawn")) {
-				Main.getInstance().getConfig().set("locations.spawn.world", p.getLocation().getWorld().getName());
-				Main.getInstance().getConfig().set("locations.spawn.x", p.getLocation().getX());
-				Main.getInstance().getConfig().set("locations.spawn.y", p.getLocation().getY());
-				Main.getInstance().getConfig().set("locations.spawn.z", p.getLocation().getZ());
-				Main.getInstance().getConfig().set("locations.spawn.yaw", p.getLocation().getYaw());
-				Main.getInstance().getConfig().set("locations.spawn.pitch", p.getLocation().getPitch());
-				
-				Main.getInstance().saveConfig();
-				p.sendMessage(ChatColor.YELLOW + "Neuer Spawnpoint gesetzt!");
-			} else if (e.getCurrentItem() == setSpawnArea) {	
-				p.sendMessage("Tool setSpawnArea");
-				//fehlt
+		try {
+			if (e.getInventory().getName().equals("§cSetup Items") && e.getInventory().getSize() == 9) {
+				if (e.getSlot() == 0 && e.getCurrentItem().getItemMeta().getDisplayName().equals("§aSetze Spawn")) {
+					Main.getInstance().getConfig().set("locations.spawn.world", p.getLocation().getWorld().getName());
+					Main.getInstance().getConfig().set("locations.spawn.x", p.getLocation().getX());
+					Main.getInstance().getConfig().set("locations.spawn.y", p.getLocation().getY());
+					Main.getInstance().getConfig().set("locations.spawn.z", p.getLocation().getZ());
+					Main.getInstance().getConfig().set("locations.spawn.yaw", p.getLocation().getYaw());
+					Main.getInstance().getConfig().set("locations.spawn.pitch", p.getLocation().getPitch());
+
+					Main.getInstance().saveConfig();
+					p.sendMessage(ChatColor.YELLOW + "Neuer Spawnpoint gesetzt!");
+				} else if (e.getSlot() == 1) {
+					EditSession es = Main.getWorldEdit().createEditSession(p);
+					World w = es.getWorld();
+					if (WGUtils.getRegionManager(w).hasRegion("spawnarea-" + p.getWorld())) {
+						p.sendMessage(ChatColor.AQUA + "Lösche alte Spawn Region in dieser Welt...");
+						WGUtils.getRegionManager(w).removeRegion("spawnarea-" + p.getWorld());
+					}
+					Region sel = Main.getWorldEdit().getSession(p).getSelection(w);
+					if (Main.getInstance().getConfig().getBoolean("setup.setspawnarea.spawn-are-vert")) {
+						if (Main.isDebug())
+							Bukkit.broadcastMessage("CONFIG VERT TRUE");
+						sel.expand(new Vector(0, w.getMaxY() + 1, 0), new Vector(0, -(w.getMaxY() + 1), 0));
+					} else {
+						if (Main.isDebug())
+							Bukkit.broadcastMessage("CONFIG VERT FALSE");
+					}
+
+					ProtectedCuboidRegion rg = new ProtectedCuboidRegion("spawnarea-" + w.getName(),
+							sel.getMinimumPoint().toBlockVector(), sel.getMaximumPoint().toBlockVector());
+					DefaultDomain dd = new DefaultDomain();
+					DefaultDomain dm = new DefaultDomain();
+					for (Player ap : Bukkit.getServer().getOnlinePlayers()) {
+						if (ap.hasPermission("survivalsystem.regions.spawn")) {
+							dd.addPlayer(Main.getWorldGuard().wrapPlayer(ap));
+						} else {
+							dm.addPlayer(Main.getWorldGuard().wrapPlayer(ap));
+						}
+					}
+					dd.addPlayer(Main.getWorldGuard().wrapPlayer(p));
+					rg.setOwners(dd);
+					rg.setMembers(dm);
+					rg.setFlag(Flags.PVP, State.DENY);
+					rg.setFlag(Flags.BLOCK_BREAK, State.DENY);
+					rg.setFlag(Flags.BLOCK_PLACE, State.DENY);
+					rg.setFlag(Flags.BUILD, State.DENY);
+					rg.setFlag(Flags.CHEST_ACCESS, State.DENY);
+					rg.setFlag(Flags.ITEM_DROP, State.DENY);
+					rg.setFlag(Flags.CHORUS_TELEPORT, State.DENY);
+					rg.setFlag(Flags.CREEPER_EXPLOSION, State.DENY);
+					rg.setFlag(Flags.DAMAGE_ANIMALS, State.DENY);
+					rg.setFlag(Flags.DESTROY_VEHICLE, State.DENY);
+					rg.setFlag(Flags.ENDERPEARL, State.DENY);
+					rg.setFlag(Flags.FALL_DAMAGE, State.DENY);
+					rg.setFlag(Flags.WITHER_DAMAGE, State.DENY);
+					rg.setFlag(Flags.MOB_DAMAGE, State.DENY);
+					rg.setFlag(Flags.GRASS_SPREAD, State.DENY);
+					rg.setFlag(Flags.ICE_MELT, State.DENY);
+					rg.setFlag(Flags.ITEM_PICKUP, State.DENY);
+					rg.setFlag(Flags.LAVA_FIRE, State.DENY);
+					rg.setFlag(Flags.LAVA_FLOW, State.DENY);
+					rg.setFlag(Flags.WATER_FLOW, State.DENY);
+					rg.setFlag(Flags.LIGHTNING, State.DENY);
+					rg.setFlag(Flags.FIRE_SPREAD, State.DENY);
+					rg.setFlag(Flags.MOB_SPAWNING, State.DENY);
+					rg.setFlag(Flags.MYCELIUM_SPREAD, State.DENY);
+					rg.setFlag(Flags.VINE_GROWTH, State.DENY);
+					rg.setFlag(Flags.TNT, State.DENY);
+					rg.setFlag(Flags.SNOW_MELT, State.DENY);
+					rg.setFlag(Flags.SNOW_FALL, State.DENY);
+
+					WGUtils.getRegionManager(w).addRegion(rg);
+					p.sendMessage(ChatColor.GREEN + "Die Spawn Region §e'§lspawnarea-" + w.getName() + ChatColor.RESET
+							+ ChatColor.GREEN + "' wurde §berfolgreich " + ChatColor.GREEN + "erstellt!");
+				}
 			} else if (e.getCurrentItem() == setNoPVPZone) {
 				p.sendMessage("Tool setNoPVPZone");
-				//fehlt
+				// fehlt
 			}
 			e.setCancelled(true);
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 }

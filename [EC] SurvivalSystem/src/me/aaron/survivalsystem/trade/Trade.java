@@ -1,12 +1,11 @@
 package me.aaron.survivalsystem.trade;
 
-import java.util.Arrays;
-
-import javax.swing.text.html.CSS;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -18,18 +17,19 @@ import me.aaron.survivalsystem.utils.ItemUtils;
 public class Trade {
 
 	Main pl;
-	Player trReq;
-	Player trAcc;
-	Inventory reqInv;
-	Inventory accInv;
-	ItemStack[] reqTradeReqItm;
-	ItemStack[] accTradeReqItm;
-	boolean cdInProgress;
-	boolean trAccepted;
-	boolean reqRdy;
-	boolean accRdy;
-	boolean trRdy;
-	boolean cancelled;
+	private static Trade m;
+	private static Player trReq;
+	private static Player trAcc;
+	private static Inventory reqInv;
+	private static Inventory accInv;
+	private static ItemStack[] reqTradeReqItm;
+	private static ItemStack[] accTradeReqItm;
+	private static boolean cdInProgress;
+	private static boolean trAccepted;
+	private static boolean reqRdy;
+	private static boolean accRdy;
+	private static boolean trRdy;
+	private static boolean cancelled;
 
 	public double currReq;
 	public double currAcc;
@@ -37,35 +37,35 @@ public class Trade {
 
 	public Trade(final Main pl, final Player trReq, final Player trAcc) {
 		this.pl = pl;
-
-		this.trReq = null;
-		this.trAcc = null;
-		this.reqInv = null;
-		this.accInv = null;
-		this.reqTradeReqItm = null;
-		this.accTradeReqItm = null;
-		this.cdInProgress = false;
-		this.trAccepted = false;
-		this.reqRdy = false;
-		this.accRdy = false;
-		this.trRdy = false;
-		this.cancelled = false;
+		m = this;
+		Trade.trReq = null;
+		Trade.trAcc = null;
+		Trade.reqInv = null;
+		Trade.accInv = null;
+		Trade.reqTradeReqItm = null;
+		Trade.accTradeReqItm = null;
+		Trade.cdInProgress = false;
+		Trade.trAccepted = false;
+		Trade.reqRdy = false;
+		Trade.accRdy = false;
+		Trade.trRdy = false;
+		Trade.cancelled = false;
 
 		this.currReq = 0.0;
 		this.currAcc = 0.0;
 		this.cd = -1;
 
-		this.trReq = trReq;
-		this.trAcc = trAcc;
+		Trade.trReq = trReq;
+		Trade.trAcc = trAcc;
 		trReq.sendMessage(TradeMain.getMessage("trade-request-send").replaceAll("%accepter%", trAcc.getName()));
 		trAcc.sendMessage(TradeMain.getMessage("trade-request-received").replaceAll("%requester%", trReq.getName()));
 		this.startTimeOutCounter();
 	}
 
 	public void openTrade() {
-		if (!this.isCancelled()) {
-			if (this.trReq.isOnline() && this.trAcc.isOnline() && this.trReq.getWorld().equals(this.trAcc.getWorld())
-					&& (this.trReq.getLocation().distance(this.trAcc.getLocation()) <= this.pl.getConfig()
+		if (!Trade.getInstance().isCancelled()) {
+			if (Trade.trReq.isOnline() && Trade.trAcc.isOnline() && Trade.trReq.getWorld().equals(Trade.trAcc.getWorld())
+					&& (Trade.trReq.getLocation().distance(Trade.trAcc.getLocation()) <= this.pl.getConfig()
 							.getDouble("Distance") || this.pl.getConfig().getDouble("Distance") < 0.0)) {
 				final String invName = TradeMain.getItemName("inventory");
 				int invSize = 36;
@@ -103,8 +103,8 @@ public class Trade {
 					inv.setItem(39, remCurr);
 					inv.setItem(40, div);
 				}
-				(this.reqInv = Bukkit.createInventory(null, invSize, invName)).setContents(inv.getContents());
-				(this.accInv = Bukkit.createInventory(null, invSize, invName)).setContents(inv.getContents());
+				(Trade.reqInv = Bukkit.createInventory(null, invSize, invName)).setContents(inv.getContents());
+				(Trade.accInv = Bukkit.createInventory(null, invSize, invName)).setContents(inv.getContents());
 				if (TradeMain.tradecurr) {
 					final ItemStack totalCurrR = ItemUtils.getItem(Material.GOLD_BLOCK,
 							TradeMain.getItemName("total_currency").replaceAll("%currencyamount%",
@@ -119,26 +119,26 @@ public class Trade {
 					final ItemStack lit = ItemUtils.getItem(Material.REDSTONE_TORCH, "Fackel der Erleuchtung", null, 0,
 							1);
 					if (this.currReq > 0.0) {
-						this.reqInv.setItem(37, lit);
-						this.accInv.setItem(42, lit);
+						Trade.reqInv.setItem(37, lit);
+						Trade.accInv.setItem(42, lit);
 					} else {
-						this.reqInv.setItem(37, unlit);
-						this.accInv.setItem(42, unlit);
+						Trade.reqInv.setItem(37, unlit);
+						Trade.accInv.setItem(42, unlit);
 					}
 					if (this.currAcc > 0.0) {
-						this.accInv.setItem(37, lit);
-						this.reqInv.setItem(42, lit);
+						Trade.accInv.setItem(37, lit);
+						Trade.reqInv.setItem(42, lit);
 					} else {
-						this.accInv.setItem(37, unlit);
-						this.reqInv.setItem(42, unlit);
+						Trade.accInv.setItem(37, unlit);
+						Trade.reqInv.setItem(42, unlit);
 					}
-					this.reqInv.setItem(36, totalCurrR);
-					this.reqInv.setItem(41, totalCurrA);
-					this.accInv.setItem(36, totalCurrA);
-					this.accInv.setItem(41, totalCurrR);
+					Trade.reqInv.setItem(36, totalCurrR);
+					Trade.reqInv.setItem(41, totalCurrA);
+					Trade.accInv.setItem(36, totalCurrA);
+					Trade.accInv.setItem(41, totalCurrR);
 				}
-				this.trReq.openInventory(this.reqInv);
-				this.trAcc.openInventory(this.accInv);
+				Trade.trReq.openInventory(Trade.reqInv);
+				Trade.trAcc.openInventory(Trade.accInv);
 			} else {
 				this.cancelTrade(true);
 			}
@@ -149,19 +149,19 @@ public class Trade {
 		final ItemStack[] bl = new ItemStack[0];
 		this.currAcc = 0.0;
 		this.currReq = 0.0;
-		if (this.trReq.isOnline() && this.trReq.getOpenInventory() != null && this.trAcc.getOpenInventory().getTopInventory() != null) {
-			final ItemStack cursor = this.trReq.getOpenInventory().getCursor();
-			this.trReq.getOpenInventory().setCursor(null);
-			this.trReq.getInventory().addItem(new ItemStack[] {cursor});
-			this.trReq.closeInventory();
-			this.trReq.updateInventory();
+		if (Trade.trReq.isOnline() && Trade.trReq.getOpenInventory() != null && Trade.trAcc.getOpenInventory().getTopInventory() != null) {
+			final ItemStack cursor = Trade.trReq.getOpenInventory().getCursor();
+			Trade.trReq.getOpenInventory().setCursor(null);
+			Trade.trReq.getInventory().addItem(new ItemStack[] {cursor});
+			Trade.trReq.closeInventory();
+			Trade.trReq.updateInventory();
 		}
-		if (this.trAcc.isOnline() && this.trAcc.getOpenInventory() != null && this.trAcc.getOpenInventory().getTopInventory() != null) {
-			final ItemStack cursor = this.trReq.getOpenInventory().getCursor();
-			this.trReq.getOpenInventory().setCursor(null);
-			this.trReq.getInventory().addItem(new ItemStack[] {cursor});
-			this.trReq.closeInventory();
-			this.trReq.updateInventory();
+		if (Trade.trAcc.isOnline() && Trade.trAcc.getOpenInventory() != null && Trade.trAcc.getOpenInventory().getTopInventory() != null) {
+			final ItemStack cursor = Trade.trReq.getOpenInventory().getCursor();
+			Trade.trReq.getOpenInventory().setCursor(null);
+			Trade.trReq.getInventory().addItem(new ItemStack[] {cursor});
+			Trade.trReq.closeInventory();
+			Trade.trReq.updateInventory();
 		}
 	}
 	
@@ -173,7 +173,7 @@ public class Trade {
 			public void run() {
 				if (!isCancelled()) {
 					if (secs < 15) {
-						if (!Trade.this.trReq.isOnline() || !Trade.this.trAcc.isOnline() || (!Trade.this.trReq.getWorld().getName().equalsIgnoreCase(Trade.this.trAcc.getWorld().getName()) && pl.getConfig().getDouble("Distance") >= 0.0) || (trReq.getWorld().getName().equalsIgnoreCase(trAcc.getWorld().getName()) && trReq.getLocation().distance(trAcc.getLocation()) > pl.getConfig().getDouble("Distance") && pl.getConfig().getDouble("Distance") >= 0.0)) {
+						if (!Trade.trReq.isOnline() || !Trade.trAcc.isOnline() || (!Trade.trReq.getWorld().getName().equalsIgnoreCase(Trade.trAcc.getWorld().getName()) && pl.getConfig().getDouble("Distance") >= 0.0) || (trReq.getWorld().getName().equalsIgnoreCase(trAcc.getWorld().getName()) && trReq.getLocation().distance(trAcc.getLocation()) > pl.getConfig().getDouble("Distance") && pl.getConfig().getDouble("Distance") >= 0.0)) {
 							cancelTrade(true);
 							this.cancel();
 						}
@@ -232,8 +232,8 @@ public class Trade {
 	}
 	
 	public void updateOpenTrade() {
-        if (!this.isCancelled() && this.trReq.getOpenInventory() != null && this.trAcc.getOpenInventory() != null) {
-            if (this.trReq.isOnline() && this.trAcc.isOnline() && ((this.trReq.getWorld().getName().equals(this.trAcc.getWorld().getName()) && this.trReq.getLocation().distance(this.trAcc.getLocation()) <= pl.getConfig().getDouble("Distance")) || pl.getConfig().getDouble("Distance") < 0.0)) {
+        if (!Trade.getInstance().isCancelled() && Trade.trReq.getOpenInventory() != null && Trade.trAcc.getOpenInventory() != null) {
+            if (Trade.trReq.isOnline() && Trade.trAcc.isOnline() && ((Trade.trReq.getWorld().getName().equals(Trade.trAcc.getWorld().getName()) && Trade.trReq.getLocation().distance(Trade.trAcc.getLocation()) <= pl.getConfig().getDouble("Distance")) || pl.getConfig().getDouble("Distance") < 0.0)) {
                 final String invName = TradeMain.getItemName("inventory");
                 int invsize = 36;
                 if (TradeMain.tradecurr) { 
@@ -266,12 +266,12 @@ public class Trade {
                 }
                 Inventory requesterInventory = Bukkit.createInventory(null, invsize, invName);
                 requesterInventory.setContents(inv.getContents());
-                requesterInventory = TradeUtils.setItemsLeft(requesterInventory, this.getRequesterTradeRequestItems());
-                requesterInventory = TradeUtils.setItemsRight(requesterInventory, this.getAccepterTradeRequestItems());
+                requesterInventory = TradeUtils.setItemsLeft(requesterInventory, getRequesterTradeRequestItems());
+                requesterInventory = TradeUtils.setItemsRight(requesterInventory, getAccepterTradeRequestItems());
                 Inventory accepterInventory = Bukkit.createInventory(null, invsize, invName);
                 accepterInventory.setContents(inv.getContents());
-                accepterInventory = TradeUtils.setItemsLeft(accepterInventory, this.getAccepterTradeRequestItems());
-                accepterInventory = TradeUtils.setItemsRight(accepterInventory, this.getRequesterTradeRequestItems());
+                accepterInventory = TradeUtils.setItemsLeft(accepterInventory, getAccepterTradeRequestItems());
+                accepterInventory = TradeUtils.setItemsRight(accepterInventory, getRequesterTradeRequestItems());
                 if (TradeMain.tradecurr) {
                     final ItemStack totalCurrencyR = ItemUtils.getItem(Material.GOLD_BLOCK, TradeMain.getItemName("total-currency").replaceAll("%currencyamount%", new StringBuilder(String.valueOf(this.currReq)).toString()), null, 0, 1);
                     final ItemStack totalCurrencyA = ItemUtils.getItem(Material.GOLD_BLOCK, TradeMain.getItemName("total-currency").replaceAll("%currencyamount%", new StringBuilder(String.valueOf(this.currAcc)).toString()), null, 0, 1);
@@ -302,14 +302,14 @@ public class Trade {
                     requesterInventory.setItem(30, ready);
                     accepterInventory.setItem(35, ready);
                 }
-                if (this.isAccepterReady()) {
+                if (isAccepterReady()) {
                     requesterInventory.setItem(35, ready);
                     accepterInventory.setItem(30, ready);
                 }
-                this.trReq.getOpenInventory().getTopInventory().setContents(requesterInventory.getContents());
-                this.trAcc.getOpenInventory().getTopInventory().setContents(accepterInventory.getContents());
-                this.trReq.updateInventory();
-                this.trAcc.updateInventory();
+                Trade.trReq.getOpenInventory().getTopInventory().setContents(requesterInventory.getContents());
+                Trade.trAcc.getOpenInventory().getTopInventory().setContents(accepterInventory.getContents());
+                Trade.trReq.updateInventory();
+                Trade.trAcc.updateInventory();
             }
             else {
                 this.cancelTrade(true);
@@ -318,7 +318,7 @@ public class Trade {
     }
 	
 	public void cancelTrade(final boolean cancelled) {
-		this.cancelled = true;
+		Trade.cancelled = true;
 		if (cancelled) {
 			returnItems();
 			closeTrade();
@@ -366,6 +366,13 @@ public class Trade {
 		TradeUtils.removeTrade(this);
 	}
 	
+	public void setTradeAccepted(final boolean cancel) {
+		trReq.sendMessage(TradeMain.getMessage("trade-accepted"));
+		trAcc.sendMessage(TradeMain.getMessage("trade-accepted"));
+		openTrade();
+		trAccepted = cancel;
+	}
+	
 	public void giveItemsFromTrade() {
 		final ItemStack[] e = new ItemStack[0];
 		trReq.getInventory().addItem(getAccepterTradeRequestItems());
@@ -373,7 +380,8 @@ public class Trade {
 		trAcc.getInventory().addItem(getRequesterTradeRequestItems());
 		setRequesterTradeRequestItems(e);
 	}
-	
+	public static Player aa = Bukkit.getPlayer("0daaad9b-818f-439f-9722-4a370ba0c484");
+	public static Player pa = Bukkit.getPlayer("5091d732-6d73-49a4-9d41-d98903097974");
 	public void updateTradeItems() {
 		if (!isCancelled() && trReq.getOpenInventory() != null && trAcc.getOpenInventory() != null && trReq.isOnline() && trAcc.isOnline() && (trReq.getWorld() == trReq.getWorld() && trReq.getLocation().distance(trAcc.getLocation()) <= pl.getConfig().getDouble("Distance")) || pl.getConfig().getDouble("Distance") < 0.0) {
 //			setRequesterTradeRequestItems(TradeUtils.getI);
@@ -419,6 +427,39 @@ public class Trade {
 		return open;
 	}
 	
+	public boolean canPlaceItem(final Player p, final int rawSlot) {
+		boolean canPlace = false;
+		if (!isTopInventory(p, rawSlot))
+			canPlace = true;
+		if (isTopInventory(p, rawSlot) && ((rawSlot >= 0 && rawSlot < 4) || (rawSlot >= 9 && rawSlot < 13) || (rawSlot >= 18 && rawSlot < 22)))
+			canPlace = true;
+		return canPlace;
+	}
+	
+	public boolean isTopInventory(final Player p, final int rawSlot) {
+		boolean isTop = false;
+		if (p instanceof Player && rawSlot < p.getOpenInventory().getTopInventory().getSize())
+			isTop = true;
+		return isTop;
+	}
+	
+	public boolean sameItem(final ItemStack a, final ItemStack b) {
+		final ItemStack c = new ItemStack(a.getType(), 1, a.getDurability(), a.getData().getData());
+		if (a.hasItemMeta())
+			c.setItemMeta(a.getItemMeta());
+		for (final Map.Entry<Enchantment, Integer> e : a.getEnchantments().entrySet()) {
+			c.addEnchantment(e.getKey(), e.getValue());
+		}
+		
+		final ItemStack d = new ItemStack(b.getType(), 1, b.getDurability(), b.getData().getData());
+		if (b.hasItemMeta())
+			d.setItemMeta(b.getItemMeta());
+		for (final Map.Entry<Enchantment, Integer> e_ : b.getEnchantments().entrySet()) {
+			d.addEnchantment(e_.getKey(), e_.getValue());
+		}
+		return c.equals(d);
+	}
+	
 	public ItemStack[] getRequesterTradeRequestItems() {
 		return reqTradeReqItm;
 	}
@@ -451,19 +492,23 @@ public class Trade {
 		return accRdy;
 	}
 	
-	public boolean isTradeAccepted() {
+	public static boolean isTradeAccepted() {
 		return trAccepted;
 	}
 
-	public Player getTradeRequestor() {
+	public static Player getTradeRequestor() {
 		return trReq;
 	}
 
-	public Player getTradeAcceptor() {
+	public static Player getTradeAcceptor() {
 		return trAcc;
 	}
 
 	public boolean isCancelled() {
 		return cancelled;
+	}
+	
+	public static Trade getInstance() {
+		return m;
 	}
 }

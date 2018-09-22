@@ -1,7 +1,5 @@
 package me.aaron.survivalsystem.utils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Material;
@@ -21,13 +19,13 @@ public class ItemUtils {
 	}
 
 	public ItemUtils(Material mat) {
-		mat = mat;
+		this.mat = mat;
 		itm = new ItemStack(mat);
 		meta = itm.getItemMeta();
 	}
 
 	public ItemUtils(ItemStack itm) {
-		itm = itm;
+		this.itm = itm;
 		meta = itm.getItemMeta();
 	}
 

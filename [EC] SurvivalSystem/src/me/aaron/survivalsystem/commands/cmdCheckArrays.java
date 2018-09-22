@@ -1,15 +1,10 @@
 package me.aaron.survivalsystem.commands;
 
-import java.util.Random;
-
-import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import me.aaron.survivalsystem.main.Main;
-
 
 public class cmdCheckArrays implements CommandExecutor {
 

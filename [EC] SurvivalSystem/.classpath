@@ -5,5 +5,6 @@
 	<classpathentry kind="lib" path="F:/Benutzer/Aaron/Dokumente/My Stuff/Stuff/Minecraft/Coding/Plugins/API&apos;s/1.13.1/spigot-api.jar"/>
 	<classpathentry kind="lib" path="F:/Benutzer/Aaron/Dokumente/My Stuff/Stuff/Minecraft/Coding/Plugins/API&apos;s/1.13.1/worldedit.jar"/>
 	<classpathentry kind="lib" path="F:/Benutzer/Aaron/Dokumente/My Stuff/Stuff/Minecraft/Coding/Plugins/API&apos;s/1.13.1/Vault-1.7.1.jar"/>
+	<classpathentry kind="lib" path="F:/Benutzer/Aaron/Dokumente/My Stuff/Stuff/Minecraft/Coding/Plugins/API&apos;s/1.13.1/worldguard.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

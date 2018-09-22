@@ -14,7 +14,7 @@ public class TradeUtils {
 	private static List<Trade> trList;
 	
 	public TradeUtils(final TradeMain tm) {
-		this.trList = new ArrayList<>();
+		TradeUtils.trList = new ArrayList<>();
 		this.tm = tm;
 	}
 
@@ -28,14 +28,14 @@ public class TradeUtils {
 		trList = trades;
 	}
 	
-	public void addTrade(final Trade t) {
+	public static void addTrade(final Trade t) {
 		if (!t.isCancelled()) {
 			removeTrade(t);
 			trList.add(t);
 		}
 	}
 	
-	public Trade getTradeFromRequester(final Player req) {
+	public static Trade getTradeFromRequester(final Player req) {
 		Trade t = null;
 		for (final Trade tr : trList) {
 			if (tr.getRequester().getName().equalsIgnoreCase(req.getName()))
@@ -44,7 +44,7 @@ public class TradeUtils {
 		return t;
 	}
 	
-	public Trade getTradeFromAccepter(final Player acc) {
+	public static Trade getTradeFromAccepter(final Player acc) {
 		Trade t = null;
 		for (final Trade tr : trList) {
 			if (tr.getAccepter().getName().equalsIgnoreCase(acc.getName()))
@@ -93,12 +93,54 @@ public class TradeUtils {
 		return inv;
 	}
 	
-	public ItemStack[] getItemsRequester(final Player p) {
+	public static ItemStack[] getItemsRequester(final Player p) {
 		final List<ItemStack> itms = new ArrayList<>();
-		return null;
+		if (getTradeFromRequester(p) != null) {
+			final Trade t = getTradeFromRequester(p);
+			if (t.hasTradeWindowOpen(p)) {
+				final Inventory inv = p.getOpenInventory().getTopInventory();
+				for (int slot = 0; slot < 4; ++slot) {
+					if (inv.getItem(slot) != null)
+						itms.add(inv.getItem(slot));
+				}
+				for (int slot = 9; slot < 13; ++slot) {
+					if (inv.getItem(slot) != null)
+						itms.add(inv.getItem(slot));
+				}
+				for (int slot = 18; slot < 22; ++slot) {
+					if (inv.getItem(slot) != null)
+						itms.add(inv.getItem(slot));
+				}
+			}
+		}
+		return itms.toArray(new ItemStack[itms.size()]);
 	}
 	
-	public List<Trade> getAllTrades() {
+	public static ItemStack[] getItemsAccepter(final Player p) {
+		final List<ItemStack> itms = new ArrayList<>();
+		if (getTradeFromAccepter(p) != null) {
+			final Trade t = getTradeFromAccepter(p);
+			if (t.hasTradeWindowOpen(p)) {
+				final Inventory inv = p.getOpenInventory().getTopInventory();
+				for (int slot = 0; slot < 4; ++slot) {
+					if (inv.getItem(slot) != null)
+						itms.add(inv.getItem(slot));
+				}
+				for (int slot = 9; slot < 13; ++slot) {
+					if (inv.getItem(slot) != null)
+						itms.add(inv.getItem(slot));
+				}
+				for (int slot = 18; slot < 22; ++slot) {
+					if (inv.getItem(slot) != null)
+						itms.add(inv.getItem(slot));
+				}
+			}
+		}
+		return itms.toArray(new ItemStack[itms.size()]);
+	}
+	
+	
+	public static List<Trade> getAllTrades() {
 		return trList;
 	}
 }

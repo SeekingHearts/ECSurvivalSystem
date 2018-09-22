@@ -2,7 +2,7 @@ name: SurvivalSystem
 version: 1.0
 authors: [Aaron alias TheSaltyOne, Patrick]
 main: me.aaron.survivalsystem.main.Main
-depend: [WorldEdit]
+depend: [WorldEdit, WorldGuard]
 api-version: 1.13
 
 commands:

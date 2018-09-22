@@ -1,4 +1,6 @@
-
+setup:
+  setspawnarea:
+    spawn-are-vert: false # Set this to 'true' to make the region from the top to the bottom (equals //expand vert)
 
 # END OF CONFIG!!
 
