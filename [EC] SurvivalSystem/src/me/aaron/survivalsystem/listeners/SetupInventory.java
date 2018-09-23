@@ -15,9 +15,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.flags.Flags;
@@ -69,7 +69,7 @@ public class SetupInventory implements Listener {
 			return;
 		try {
 			if (e.getInventory().getName().equals("§cSetup Items") && e.getInventory().getSize() == 9) {
-				if (e.getSlot() == 0 && e.getCurrentItem().getItemMeta().getDisplayName().equals("§aSetze Spawn")) {
+				if (e.getSlot() == 0) {
 					Main.getInstance().getConfig().set("locations.spawn.world", p.getLocation().getWorld().getName());
 					Main.getInstance().getConfig().set("locations.spawn.x", p.getLocation().getX());
 					Main.getInstance().getConfig().set("locations.spawn.y", p.getLocation().getY());
@@ -81,23 +81,22 @@ public class SetupInventory implements Listener {
 					p.sendMessage(ChatColor.YELLOW + "Neuer Spawnpoint gesetzt!");
 				} else if (e.getSlot() == 1) {
 					EditSession es = Main.getWorldEdit().createEditSession(p);
-					World w = es.getWorld();
+					World w = new BukkitWorld(p.getWorld());
 					if (WGUtils.getRegionManager(w).hasRegion("spawnarea-" + p.getWorld())) {
 						p.sendMessage(ChatColor.AQUA + "Lösche alte Spawn Region in dieser Welt...");
 						WGUtils.getRegionManager(w).removeRegion("spawnarea-" + p.getWorld());
 					}
-					Region sel = Main.getWorldEdit().getSession(p).getSelection(w);
-					if (Main.getInstance().getConfig().getBoolean("setup.setspawnarea.spawn-are-vert")) {
-						if (Main.isDebug())
-							Bukkit.broadcastMessage("CONFIG VERT TRUE");
-						sel.expand(new Vector(0, w.getMaxY() + 1, 0), new Vector(0, -(w.getMaxY() + 1), 0));
-					} else {
-						if (Main.isDebug())
-							Bukkit.broadcastMessage("CONFIG VERT FALSE");
-					}
 
-					ProtectedCuboidRegion rg = new ProtectedCuboidRegion("spawnarea-" + w.getName(),
-							sel.getMinimumPoint().toBlockVector(), sel.getMaximumPoint().toBlockVector());
+					org.bukkit.World sw = Bukkit.getServer().getWorld(Main.getInstance().getConfig().getString("locations.spawn.world"));
+					double sx = Main.getInstance().getConfig().getDouble("locations.spawn.x");
+					double sy = Main.getInstance().getConfig().getDouble("locations.spawn.y");
+					double sz = Main.getInstance().getConfig().getDouble("locations.spawn.z");
+					float syaw = (float) Main.getInstance().getConfig().getDouble("locations.spawn.yaw");
+					float spitch = (float) Main.getInstance().getConfig().getDouble("locations.spawn.pitch");
+					
+//					ProtectedCuboidRegion rg = new ProtectedCuboidRegion("spawnarea-" + w.getName(),
+//							sel.getMinimumPoint().toBlockVector(), sel.getMaximumPoint().toBlockVector());
+					ProtectedCuboidRegion rg = new ProtectedCuboidRegion("spawnarea-" + w.getName(), new BlockVector(sx + 200, w.getMaxY() + 1, sy + 200), new BlockVector(sx - 200,  -(w.getMaxY() + 1), sy - 200));
 					DefaultDomain dd = new DefaultDomain();
 					DefaultDomain dm = new DefaultDomain();
 					for (Player ap : Bukkit.getServer().getOnlinePlayers()) {

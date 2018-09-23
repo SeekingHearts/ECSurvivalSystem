@@ -13,6 +13,8 @@ commands:
     description: LOL
   checkarray:
     description: DEV COMMAND DONT TOUCH
+  checkareas:
+    description: DEV COMMAND DONT TOUCH
 
 permissions:
   survivalsystem.setup:

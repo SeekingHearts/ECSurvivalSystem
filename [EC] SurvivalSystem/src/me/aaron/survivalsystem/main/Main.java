@@ -70,6 +70,7 @@ public class Main extends JavaPlugin {
 		getCommand("setup").setExecutor(new cmdSetup());
 		getCommand("rtp").setExecutor(new cmdRandomTP());
 		getCommand("checkarray").setExecutor(new cmdCheckArrays());
+		getCommand("checkareas").setExecutor(new cmdInArea());
 	}
 	
 	private void initListeners() {
