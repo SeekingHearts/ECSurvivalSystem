@@ -1,6 +1,9 @@
 package me.aaron.survivalsystem.main;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -117,7 +120,7 @@ public class Main extends JavaPlugin {
 		MySQL.connect();
 		if (MySQL.isConnected()) {
 			if (!SQL.tableExists("citysystem")) {
-				SQL.createTable("citysystem", "id INT (30) PRIMARY, creator TEXT, name TEXT, size TEXT, creationdate TIMESTAMP");
+				SQL.createTable("cities", "id INT (30) PRIMARY AUTOINCREMENT, creator TEXT, name TEXT, size TEXT, creationdate TIMESTAMP");
 			}
 		}
 	}
@@ -174,6 +177,12 @@ public class Main extends JavaPlugin {
 			getLogger().severe("WorldGuard Plugin not found! Disabling plugin...");
 			disablePlugin();
 		}
+	}
+	
+	public static String getCurrentDate() {
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		Date d = new Date();
+		return df.format(d);
 	}
 	
 	protected void disablePlugin() {
