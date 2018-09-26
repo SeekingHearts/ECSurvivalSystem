@@ -87,16 +87,21 @@ public class SetupInventory implements Listener {
 						WGUtils.getRegionManager(w).removeRegion("spawnarea-" + p.getWorld());
 					}
 
-					org.bukkit.World sw = Bukkit.getServer().getWorld(Main.getInstance().getConfig().getString("locations.spawn.world"));
+					org.bukkit.World sw = Bukkit.getServer()
+							.getWorld(Main.getInstance().getConfig().getString("locations.spawn.world"));
 					double sx = Main.getInstance().getConfig().getDouble("locations.spawn.x");
 					double sy = Main.getInstance().getConfig().getDouble("locations.spawn.y");
 					double sz = Main.getInstance().getConfig().getDouble("locations.spawn.z");
 					float syaw = (float) Main.getInstance().getConfig().getDouble("locations.spawn.yaw");
 					float spitch = (float) Main.getInstance().getConfig().getDouble("locations.spawn.pitch");
-					
-//					ProtectedCuboidRegion rg = new ProtectedCuboidRegion("spawnarea-" + w.getName(),
-//							sel.getMinimumPoint().toBlockVector(), sel.getMaximumPoint().toBlockVector());
-					ProtectedCuboidRegion rg = new ProtectedCuboidRegion("spawnarea-" + w.getName(), new BlockVector(sx + 200, w.getMaxY() + 1, sy + 200), new BlockVector(sx - 200,  -(w.getMaxY() + 1), sy - 200));
+
+					// ProtectedCuboidRegion rg = new ProtectedCuboidRegion("spawnarea-" +
+					// w.getName(),
+					// sel.getMinimumPoint().toBlockVector(),
+					// sel.getMaximumPoint().toBlockVector());
+					ProtectedCuboidRegion rg = new ProtectedCuboidRegion("spawnarea-" + w.getName(),
+							new BlockVector(sx + 200, w.getMaxY() + 1, sy + 200),
+							new BlockVector(sx - 200, -(w.getMaxY() + 1), sy - 200));
 					DefaultDomain dd = new DefaultDomain();
 					DefaultDomain dm = new DefaultDomain();
 					for (Player ap : Bukkit.getServer().getOnlinePlayers()) {
@@ -144,7 +149,29 @@ public class SetupInventory implements Listener {
 				}
 			} else if (e.getCurrentItem() == setNoPVPZone) {
 				p.sendMessage("Tool setNoPVPZone");
-				// fehlt
+				World w = new BukkitWorld(
+						Bukkit.getServer().getWorld(Main.getInstance().getConfig().getString("locations.spawn.world")));
+				double sx = Main.getInstance().getConfig().getDouble("locations.spawn.x");
+				double sy = Main.getInstance().getConfig().getDouble("locations.spawn.y");
+				double sz = Main.getInstance().getConfig().getDouble("locations.spawn.z");
+				float syaw = (float) Main.getInstance().getConfig().getDouble("locations.spawn.yaw");
+				float spitch = (float) Main.getInstance().getConfig().getDouble("locations.spawn.pitch");
+				ProtectedCuboidRegion np = new ProtectedCuboidRegion("spawnarea-" + w.getName(),
+						new BlockVector(sx + 200, w.getMaxY() + 1, sy + 200),
+						new BlockVector(sx - 200, -(w.getMaxY() + 1), sy - 200));
+				DefaultDomain dd = new DefaultDomain();
+				DefaultDomain dm = new DefaultDomain();
+				for (Player ap : Bukkit.getServer().getOnlinePlayers()) {
+					if (ap.hasPermission("survivalsystem.regions.spawn")) {
+						dd.addPlayer(Main.getWorldGuard().wrapPlayer(ap));
+					} else {
+						dm.addPlayer(Main.getWorldGuard().wrapPlayer(ap));
+					}
+					np.setOwners(dd);
+					np.setMembers(dm);
+					np.setFlag(Flags.PVP, State.DENY);
+					np.setFlag(Flags.TNT, State.DENY);
+				}
 			}
 			e.setCancelled(true);
 		} catch (Exception ex) {
