@@ -36,8 +36,9 @@ public class SetupInventory implements Listener {
 	ItemStack setSpawnArea = ItemUtils.getItem(Material.COMPASS, "§aSetze Spawn Region",
 			Arrays.asList(ChatColor.GRAY + "Setze die Spawngegend"), 0, 1);
 	ItemStack setNoPVPZone = ItemUtils.getItem(Material.GREEN_WOOL, "§aSetze PVP-freie Zone",
-			Arrays.asList(ChatColor.GRAY + "Setze PVP freie Zone"), 0, 1);
-	// ItemStack = ItemUtils.getItem(mat, name, lore, dmg, amount);
+			Arrays.asList(ChatColor.GRAY + "Setze PVP freie Zone, PVE erlaubt"), 0, 1);
+	ItemStack setSaveZone = ItemUtils.getItem(Material.EMERALD_BLOCK, "§aSetze eine sichere Zone",
+			Arrays.asList(ChatColor.GRAY + "Setze eine Zone, in welcher man kein Schaden bekommen kann"), 0, 1);
 
 	@EventHandler
 	public void onCompass(PlayerInteractEvent e) {
@@ -142,6 +143,7 @@ public class SetupInventory implements Listener {
 					rg.setFlag(Flags.TNT, State.DENY);
 					rg.setFlag(Flags.SNOW_MELT, State.DENY);
 					rg.setFlag(Flags.SNOW_FALL, State.DENY);
+					rg.setFlag(Flags.FALL_DAMAGE, State.DENY);
 
 					WGUtils.getRegionManager(w).addRegion(rg);
 					p.sendMessage(ChatColor.GREEN + "Die Spawn Region §e'§lspawnarea-" + w.getName() + ChatColor.RESET
@@ -156,7 +158,7 @@ public class SetupInventory implements Listener {
 				double sz = Main.getInstance().getConfig().getDouble("locations.spawn.z");
 				float syaw = (float) Main.getInstance().getConfig().getDouble("locations.spawn.yaw");
 				float spitch = (float) Main.getInstance().getConfig().getDouble("locations.spawn.pitch");
-				ProtectedCuboidRegion np = new ProtectedCuboidRegion("spawnarea-" + w.getName(),
+				ProtectedCuboidRegion rg = new ProtectedCuboidRegion("spawnarea-" + w.getName(),
 						new BlockVector(sx + 200, w.getMaxY() + 1, sy + 200),
 						new BlockVector(sx - 200, -(w.getMaxY() + 1), sy - 200));
 				DefaultDomain dd = new DefaultDomain();
@@ -167,10 +169,51 @@ public class SetupInventory implements Listener {
 					} else {
 						dm.addPlayer(Main.getWorldGuard().wrapPlayer(ap));
 					}
-					np.setOwners(dd);
-					np.setMembers(dm);
-					np.setFlag(Flags.PVP, State.DENY);
-					np.setFlag(Flags.TNT, State.DENY);
+					rg.setOwners(dd);
+					rg.setMembers(dm);
+					rg.setFlag(Flags.PVP, State.DENY);
+					rg.setFlag(Flags.TNT, State.DENY);
+				}
+			}
+			else if (e.getCurrentItem() == setNoPVPZone) {
+				p.sendMessage("Tool setNoPVPZone");
+				World w = new BukkitWorld(
+						Bukkit.getServer().getWorld(Main.getInstance().getConfig().getString("locations.spawn.world")));
+				double sx = Main.getInstance().getConfig().getDouble("locations.spawn.x");
+				double sy = Main.getInstance().getConfig().getDouble("locations.spawn.y");
+				double sz = Main.getInstance().getConfig().getDouble("locations.spawn.z");
+				float syaw = (float) Main.getInstance().getConfig().getDouble("locations.spawn.yaw");
+				float spitch = (float) Main.getInstance().getConfig().getDouble("locations.spawn.pitch");
+				ProtectedCuboidRegion rg = new ProtectedCuboidRegion("spawnarea-" + w.getName(),
+						new BlockVector(sx + 200, w.getMaxY() + 1, sy + 200),
+						new BlockVector(sx - 200, -(w.getMaxY() + 1), sy - 200));
+				DefaultDomain dd = new DefaultDomain();
+				DefaultDomain dm = new DefaultDomain();
+				for (Player ap : Bukkit.getServer().getOnlinePlayers()) {
+					if (ap.hasPermission("survivalsystem.regions.spawn")) {
+						dd.addPlayer(Main.getWorldGuard().wrapPlayer(ap));
+					} else {
+						dm.addPlayer(Main.getWorldGuard().wrapPlayer(ap));
+					}
+					dd.addPlayer(Main.getWorldGuard().wrapPlayer(p));
+					rg.setOwners(dd);
+					rg.setMembers(dm);
+					rg.setFlag(Flags.PVP, State.DENY);
+					rg.setFlag(Flags.ITEM_DROP, State.DENY);
+					rg.setFlag(Flags.CREEPER_EXPLOSION, State.DENY);
+					rg.setFlag(Flags.DAMAGE_ANIMALS, State.DENY);
+					rg.setFlag(Flags.DESTROY_VEHICLE, State.DENY);
+					rg.setFlag(Flags.FALL_DAMAGE, State.DENY);
+					rg.setFlag(Flags.WITHER_DAMAGE, State.DENY);
+					rg.setFlag(Flags.MOB_DAMAGE, State.DENY);
+					rg.setFlag(Flags.ICE_MELT, State.DENY);
+					rg.setFlag(Flags.ITEM_PICKUP, State.DENY);
+					rg.setFlag(Flags.LAVA_FIRE, State.DENY);
+					rg.setFlag(Flags.LIGHTNING, State.DENY);
+					rg.setFlag(Flags.MOB_SPAWNING, State.DENY);
+					rg.setFlag(Flags.MYCELIUM_SPREAD, State.DENY);
+					rg.setFlag(Flags.TNT, State.DENY);
+					rg.setFlag(Flags.FALL_DAMAGE, State.DENY);
 				}
 			}
 			e.setCancelled(true);
